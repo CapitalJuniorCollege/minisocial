@@ -80,7 +80,7 @@ def logged_in_menu
   puts '#'*60
   puts '#'*60
   puts "MINISOCIAL :)".rjust(40, '#') + '#'*20
-  puts "WELCOME - #{@current_user.nickname.blank? ?
+  puts "WELCOME - #{@current_user.nickname.length <= 0 ?
                     @current_user.email :
                     @current_user.nickname}"
   puts "_"*60
@@ -95,13 +95,13 @@ end
 
 def sign_up
   system "clear"
-  puts "Dijite su correo electronico."
+  puts "Digite su correo electronico."
   email = gets.chomp
-  puts "Dijite su password."
+  puts "Digite su password."
   password = gets.chomp
   puts "Confirme su password."
   password_confirmation = gets.chomp
-  puts "Dijite su nickname."
+  puts "Digite su nickname."
   nickname = gets.chomp
   if password != password_confirmation
     system "clear"
@@ -118,23 +118,55 @@ def sign_up
     return
   end
   @users[email] = User.new(email: email, password: password, nickname: nickname)
-  @current_user = @user
+  @current_user = @users[email]
+end
+
+def sign_in
+  system "clear"
+  puts "Digite su correo electronico."
+  email = gets.chomp
+  puts "Digite su password"
+  password  = gets.chomp
+  if @users[email] and @users[email].authenticate(password)
+    @current_user = @users[email]
+  else
+    system "clear"
+    puts "email o el password incorrecto. Intente de nuevo, presione cualquier tecla para continuar..."
+    gets.chomp
+    return
+  end
+end
+
+def logout
+  system "clear"
+  puts "BYE BYE BYE !!!! Presione, cualquier tecla para continuar..."
+  gets.chomp
+  @current_user = nil
+  return
 end
 
 @input = nil
 @users = {}
+@users["yonga@email.com"] = User.new(
+    email: "yonga@email.com",
+    password: "password",
+    nickname: "yonga"
+)
 @current_user = nil
 while @input != 0 do
   if @current_user
     logged_in_menu
+    case @input
+    when 3 then logout
+    end
   else
     menu
     case @input
     when 1 then sign_up
+    when 2 then sign_in
     end
-    puts @users.inspect
-    menu
   end
+  @current_user ? logged_in_menu : menu
   @input = gets.chomp.to_i
 end
 #
