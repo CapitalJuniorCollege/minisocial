@@ -6,6 +6,12 @@ class Post
     @body = opts[:body].to_s
   end
 
+  def nice_print
+    puts "*"*5
+    puts "\t #{self.body}"
+    puts "*"*5
+  end
+
 end
 
 class User
@@ -33,6 +39,14 @@ class User
 
   def authenticate(password_submitted)
     self.password == password_submitted.to_s
+  end
+
+  def nice_print_posts
+    puts "-- #{self.email} --"
+    self.posts.each do |post|
+      post.nice_print
+    end
+    puts ""
   end
 
 end
@@ -145,6 +159,32 @@ def logout
   return
 end
 
+def publish
+  system "clear"
+  puts "Escriba a ver...."
+  body = gets.chomp
+  if body.length <= 0
+    system "clear"
+    puts "Tu publicacion debe tener contenido!!!!!. Presiona cualquier tecla para continuar"
+    gets.chomp
+    publish
+    return
+  end
+  @current_user.create_post(body: body)
+  puts "Le quedo linda la pendejada."
+  gets.chomp
+end
+
+def feed
+  system "clear"
+  puts "FEED "
+  puts ""
+  @users.each do |email,user|
+    user.nice_print_posts
+  end
+  gets.chomp
+end
+
 @input = nil
 @users = {}
 @users["yonga@email.com"] = User.new(
@@ -157,6 +197,8 @@ while @input != 0 do
   if @current_user
     logged_in_menu
     case @input
+    when 1 then publish
+    when 2 then feed
     when 3 then logout
     end
   else
